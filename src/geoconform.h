@@ -18,7 +18,7 @@
 #define GEOCONFORM_H
 
 #ifdef __cplusplus
-  extern "C" {
+extern "C" {
 #endif
 
 #define MAXVAL 256
@@ -40,78 +40,89 @@
 #ifndef TRIM
 #define TRIM(x,a,b) (MIN(FA_MAX((x),(a)),(b)))
 #endif
+#define COUNTA 20
+#define COUNTC 3
+#define COUNTG 10
 
-typedef uint8_t BYTE;
-typedef uint16_t WORD;
+    typedef uint8_t BYTE;
+    typedef uint16_t WORD;
 
-typedef struct
-{
-    BYTE c[3];
-    WORD s;
-}
-IMTpixel;
+    typedef struct
+    {
+        BYTE c[COUNTC];
+        WORD s;
+    }
+    IMTpixel;
 
-typedef struct
-{
-    unsigned width, height;
-}
-IMTsize;
+    typedef struct
+    {
+        unsigned width, height;
+    }
+    IMTsize;
 
-typedef struct
-{
-    unsigned bits;
-    IMTsize size;
-    IMTpixel **p;
-    BYTE **b;
-}
-IMTimage;
+    typedef struct
+    {
+        unsigned bits;
+        IMTsize size;
+        IMTpixel **p;
+        BYTE **b;
+    }
+    IMTimage;
 
-typedef struct
-{
-    float x, y;
-}
-GCIcoord;
+    typedef struct
+    {
+        float x, y;
+    }
+    GCIcoord;
 
-typedef struct
-{
-    GCIcoord p[4];
-}
-GCIrect;
+    typedef struct
+    {
+        GCIcoord p[4];
+        GCIcoord min, max, mean;
+    }
+    GCIrect;
 
-typedef struct
-{
-    unsigned n;
-    float dx, dy;
-    float rxy2;
-    GCIcoord *p0, *p1, *pd;
-}
-GCIgrid;
+    typedef struct
+    {
+        unsigned n, count;
+        float kernel;
+        GCIcoord *p1, *p2, *pd;
+    }
+    GCIgrid;
 
-typedef struct
-{
-    unsigned na, ng;
-    IMTsize size1, size2;
-    double a[12];
-    GCIrect rect1, rect2;
-    GCIgrid grid;
-}
-GCIparams;
+    typedef struct
+    {
+        unsigned na;
+        double a[COUNTA];
+    }
+    GCIctrans;
+
+    typedef struct
+    {
+        IMTsize size1, size2;
+        GCIctrans trans;
+        GCIrect rect1, rect2;
+        GCIgrid grid;
+        float m, mi;
+    }
+    GCIparams;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-BYTE ByteClamp(int);
-WORD Byte3Clamp(int);
-unsigned IndexClamp(int, unsigned);
-IMTpixel IMTset (BYTE, BYTE, BYTE);
-IMTpixel IMTcalcS (IMTpixel);
-IMTimage IMTalloc (IMTsize, int);
-IMTimage IMTfree (IMTimage);
-IMTpixel IMTinterpolation (IMTimage, GCIcoord);
-GCIparams GCIcalcallparams(GCIparams);
-IMTimage IMTFilterGeoConform (IMTimage, IMTimage, GCIparams);
+    BYTE ByteClamp(int);
+    WORD Byte3Clamp(int);
+    unsigned IndexClamp(int, unsigned);
+    IMTpixel IMTset (BYTE, BYTE, BYTE);
+    IMTpixel IMTcalcS (IMTpixel);
+    IMTimage IMTalloc (IMTsize, int);
+    IMTimage IMTfree (IMTimage);
+    IMTpixel IMTinterpolation (IMTimage, GCIcoord);
+    GCIcoord GCIconformaltrans(GCIctrans, GCIcoord);
+    GCIparams GCIcalcallparams(GCIparams);
+    IMTimage IMTFilterGeoConform (IMTimage, IMTimage, GCIparams);
 
 #ifdef __cplusplus
- }
-#endif 
+}
+#endif
 
 #endif // GEOCONFORM_H

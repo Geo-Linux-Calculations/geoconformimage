@@ -27,8 +27,8 @@ void GeoConformImageUsage(const char *progname)
 {
     printf("Usage : %s [options] <input_image> <output_image>\n", progname);
     printf("options:\n");
-    printf("    -g N    grid set (default = 5)\n");
-    printf("    -p str  string confom params: \"A0,B0,A1,B1,[...,A5,B5]\"\n");
+    printf("    -g N    grid set (default = %d)\n", COUNTG);
+    printf("    -p str  string conform params: \"A0,B0,A1,B1,[...,A9,B9]\"\n");
     printf("    -r str  string region image: \"Xws,Yws,Xne,Yne\"\n");
     printf("    -h      this help\n");
 }
@@ -46,51 +46,50 @@ int main(int argc, char *argv[])
     GCIparams params;
     IMTimage imgin, imgout;
     bool fhelp = false;
+    params.grid.n = COUNTG;
+
+    GeoConformImageTitle();
+
     while ((opt = getopt(argc, argv, ":g:p:r:h")) != -1)
     {
         switch(opt)
         {
-            case 'g':
-                params.ng = atoi(optarg);
-                break;
-            case 'p':
-                params.na = sscanf(optarg, "%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf", &params.a[0], &params.a[1], &params.a[2], &params.a[3], &params.a[4], &params.a[5], &params.a[6], &params.a[7], &params.a[8], &params.a[9], &params.a[10], &params.a[11]);
-                if (params.na < 4)
-                {
-                    printf("Error! Bad parameters: %s (%d < %d).\n", optarg, params.na, 4);
-                    exit(1);
-                }
-                params.na /= 2;
-                params.na *= 2;
-                printf("DEBUG: %s np: %d.\n", optarg, params.na);
-                break;
-            case 'r':
-                nk = sscanf(optarg, "%lf,%lf,%lf,%lf", &params.rect1.p[0].x, &params.rect1.p[0].y, &params.rect1.p[2].x, &params.rect1.p[2].y);
-                if (nk < 4)
-                {
-                    printf("Error! Bad region: %s (%d < %d).\n", optarg, nk, 4);
-                    exit(1);
-                }
-                params.rect1.p[1].x = params.rect1.p[0].x;
-                params.rect1.p[1].y = params.rect1.p[2].y;
-                params.rect1.p[3].x = params.rect1.p[2].x;
-                params.rect1.p[3].y = params.rect1.p[0].y;
-                break;
-            case 'h':
-                fhelp = true;
-                break;
-            case ':':
-                printf("option needs a value\n");
-                break;
-            case '?':
-                printf("unknown option: %c\n", optopt);
-                break;
+        case 'g':
+            params.grid.n = atoi(optarg);
+            if (params.grid.n < 2) params.grid.n = 2;
+            printf("Parameter grid set %d.\n", params.grid.n);
+            break;
+        case 'p':
+            params.trans.na = sscanf(optarg, "%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf", &params.trans.a[0], &params.trans.a[1], &params.trans.a[2], &params.trans.a[3], &params.trans.a[4], &params.trans.a[5], &params.trans.a[6], &params.trans.a[7], &params.trans.a[8], &params.trans.a[9], &params.trans.a[10], &params.trans.a[11], &params.trans.a[12], &params.trans.a[13], &params.trans.a[14], &params.trans.a[15], &params.trans.a[16], &params.trans.a[17], &params.trans.a[18], &params.trans.a[19]);
+            if (params.trans.na < 3)
+            {
+                fprintf(stderr, "Error! Bad parameters: %s (%d < %d).\n", optarg, params.trans.na, 3);
+                exit(1);
+            }
+            printf("Parameter trans set %s (%d).\n", optarg, params.trans.na);
+            break;
+        case 'r':
+            nk = sscanf(optarg, "%f,%f,%f,%f", &params.rect1.p[0].x, &params.rect1.p[0].y, &params.rect1.p[2].x, &params.rect1.p[2].y);
+            if (nk < 4)
+            {
+                fprintf(stderr, "Error! Bad region: %s (%d < %d).\n", optarg, nk, 4);
+                exit(1);
+            }
+            printf("Parameter rect set %s (%d).\n", optarg, nk);
+            break;
+        case 'h':
+            fhelp = true;
+            break;
+        case ':':
+            printf("option needs a value\n");
+            break;
+        case '?':
+            printf("unknown option: %c\n", optopt);
+            break;
         }
     }
 
-    GeoConformImageTitle();
-
-    if (optind + 2 > argc || params.na < 4 || nk < 4 || fhelp)
+    if (optind + 2 > argc || params.trans.na < 3 || nk < 4 || fhelp)
     {
         GeoConformImageUsage(argv[0]);
         return 0;
@@ -114,7 +113,6 @@ int main(int argc, char *argv[])
             p_im = ImthresholdGetData(dib, p_im);
             FreeImage_Unload(dib);
             params = GCIcalcallparams(params);
-            params.size2 = imgin.size;
             IMTimage d_im = IMTalloc(params.size2, 24);
 
             IMTFilterGeoConform(p_im, d_im, params);
@@ -122,6 +120,7 @@ int main(int argc, char *argv[])
             dst_dib = FreeImage_Allocate(d_im.size.width, d_im.size.height, 24);
             ImthresholdSetData(dst_dib, d_im);
             d_im = IMTfree(d_im);
+            printf("Result rect from \"(%f,%f)-(%f,%f)\" to \"(%f,%f)-(%f,%f)\".\n", params.rect1.min.x, params.rect1.min.y, params.rect1.max.x, params.rect1.max.y, params.rect2.min.x, params.rect2.min.y, params.rect2.max.x, params.rect2.max.y);
 
             if (dst_dib)
             {
@@ -133,7 +132,9 @@ int main(int argc, char *argv[])
                 }
                 FreeImage_Unload(dst_dib);
             }
-        } else {
+        }
+        else
+        {
             printf("%s\n", "Unsupported format type.");
             FreeImage_Unload(dib);
         }

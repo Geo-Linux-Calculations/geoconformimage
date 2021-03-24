@@ -1,4 +1,4 @@
-.TH "GeoConformImage" 1 0.20210323 "23 Mar 2021" "User Manual"
+.TH "GeoConformImage" 1 0.20210324 "24 Mar 2021" "User Manual"
 
 .SH NAME
 geoconformimage
@@ -12,10 +12,10 @@ geoconformimage [options] <input_image> <output_image>
 .SH OPTIONS
 .TP
 -g N
-grid set (default = 5)
+grid set (default = 10)
 .TP
 -p str
-string confom params: "A0,B0,A1,B1,[...,A5,B5]"
+string conform params: "A0,B0,A1,B1,[...,A9,B9]"
 .TP
 -r str
 string region image: "Xws,Yws,Xne,Yne"
@@ -26,12 +26,17 @@ help
 .SH EXAMPLE
 geoconformimage -p 100,100,1,0 -r 0,0,100,100 sample.png target.png
 
+WARNING! Elastic back radial mesh does not always cope.
+Try increasing the "grid set", but this will increase
+the processing time by a factor of O(N^4).
+
 .SH COPYRIGHT
 Public Domain Mark 1.0
  No Copyright
 
 .SH SEE ALSO
  imthreshold,
+ geofindkey
 
 .SH CONTACTS
  GIT: https://github.com/Geo-Linux-Calculations/geoconformimage

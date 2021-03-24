@@ -1,11 +1,11 @@
-PNAME         = geoconforminge
+PNAME         = geoconformimage
 PROGNAME      = $(PNAME)
 CC            = gcc
 CPP           = g++
 CFLAGS        = -DUNIX -O2 -Wall -s
 LIBS          = -lfreeimage
 VER           = 0
-VERB          = 20210323
+VERB          = 20210324
 ifeq ($(OS),Windows_NT)
 PLIBF         = $(PNAME).$(VER).dll
 PLIBFI        = $(PNAME)freeimage.$(VER).dll
