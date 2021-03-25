@@ -27,7 +27,7 @@ void GeoConformImageUsage(const char *progname)
 {
     printf("Usage : %s [options] <input_image> <output_image>\n", progname);
     printf("options:\n");
-    printf("    -g N    grid set (default = %d)\n", COUNTG);
+    printf("    -i N    iteration set (default = %d)\n", COUNTG);
     printf("    -p str  string conform params: \"A0,B0,A1,B1,[...,A9,B9]\"\n");
     printf("    -r str  string region image: \"Xws,Yws,Xne,Yne\"\n");
     printf("    -h      this help\n");
@@ -46,18 +46,18 @@ int main(int argc, char *argv[])
     GCIparams params;
     IMTimage imgin, imgout;
     bool fhelp = false;
-    params.grid.n = COUNTG;
+    params.iters = COUNTG;
 
     GeoConformImageTitle();
 
-    while ((opt = getopt(argc, argv, ":g:p:r:h")) != -1)
+    while ((opt = getopt(argc, argv, ":i:p:r:h")) != -1)
     {
         switch(opt)
         {
-        case 'g':
-            params.grid.n = atoi(optarg);
-            if (params.grid.n < 2) params.grid.n = 2;
-            printf("Parameter grid set %d.\n", params.grid.n);
+        case 'i':
+            params.iters = atoi(optarg);
+            if (params.iters < 2) params.iters = 2;
+            printf("Parameter iters set %d.\n", params.iters);
             break;
         case 'p':
             params.trans.na = sscanf(optarg, "%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf", &params.trans.a[0], &params.trans.a[1], &params.trans.a[2], &params.trans.a[3], &params.trans.a[4], &params.trans.a[5], &params.trans.a[6], &params.trans.a[7], &params.trans.a[8], &params.trans.a[9], &params.trans.a[10], &params.trans.a[11], &params.trans.a[12], &params.trans.a[13], &params.trans.a[14], &params.trans.a[15], &params.trans.a[16], &params.trans.a[17], &params.trans.a[18], &params.trans.a[19]);
@@ -114,6 +114,7 @@ int main(int argc, char *argv[])
             FreeImage_Unload(dib);
             params = GCIcalcallparams(params);
             IMTimage d_im = IMTalloc(params.size2, 24);
+            printf("Result image size \"%dx%d\".\n", params.size2.width, params.size2.height);
 
             IMTFilterGeoConform(p_im, d_im, params);
             p_im = IMTfree(p_im);

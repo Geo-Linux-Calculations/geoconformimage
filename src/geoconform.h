@@ -84,14 +84,6 @@ extern "C" {
 
     typedef struct
     {
-        unsigned n, count;
-        float kernel;
-        GCIcoord *p1, *p2, *pd;
-    }
-    GCIgrid;
-
-    typedef struct
-    {
         unsigned na;
         double a[COUNTA];
     }
@@ -102,8 +94,8 @@ extern "C" {
         IMTsize size1, size2;
         GCIctrans trans;
         GCIrect rect1, rect2;
-        GCIgrid grid;
         float m, mi;
+        int iters;
     }
     GCIparams;
 

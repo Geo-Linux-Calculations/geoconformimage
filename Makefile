@@ -5,7 +5,7 @@ CPP           = g++
 CFLAGS        = -DUNIX -O2 -Wall -s
 LIBS          = -lfreeimage
 VER           = 0
-VERB          = 20210324
+VERB          = 20210325
 ifeq ($(OS),Windows_NT)
 PLIBF         = $(PNAME).$(VER).dll
 PLIBFI        = $(PNAME)freeimage.$(VER).dll

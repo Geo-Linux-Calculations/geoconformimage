@@ -177,28 +177,89 @@ IMTpixel IMTinterpolation (IMTimage p_im, GCIcoord p)
 
 ////////////////////////////////////////////////////////////////////////////////
 
-GCIcoord GCIconformaltrans(GCIctrans trans, GCIcoord c)
+GCIcoord GCIconformaltrans(GCIctrans trans, GCIcoord p)
 {
     unsigned i, i0, i1, n;
-    float x, y, p, q, pn, qn;
-    x = c.x;
-    y = c.y;
-    pn = 1.0f;
-    qn = 0.0f;
+    GCIcoord c, pq, pqn;
+    pqn.x = 1.0f;
+    pqn.y = 0.0f;
     n = (trans.na + 1) / 2;
     c.x = 0.0f;
     c.y = 0.0f;
     for (i = 0; i < n; i++)
     {
-        p = pn;
-        q = qn;
+        pq = pqn;
         i0 = i * 2;
         i1 = i0 + 1;
-        c.x += trans.a[i0] * p - trans.a[i1] * q;
-        c.y += trans.a[i0] * q + trans.a[i1] * p;
-        pn = x * p - y * q;
-        qn = x * q + y * p;
+        c.x += trans.a[i0] * pq.x - trans.a[i1] * pq.y;
+        c.y += trans.a[i0] * pq.y + trans.a[i1] * pq.x;
+        pqn.x = p.x * pq.x - p.y * pq.y;
+        pqn.y = p.x * pq.y + p.y * pq.x;
     }
+
+    return c;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+GCIcoord GCIconformaltransnewton(GCIctrans trans, GCIcoord p, GCIcoord t)
+{
+    unsigned i, i0, i1, n;
+    float l, ldx, ldy;
+    GCIcoord c, cdx, cdy, pq, pqn, dxpq, dxpqn, dypq, dypqn, dt, gt, gx, gy, gl, g;
+    pqn.x = 1.0f;
+    pqn.y = 0.0f;
+    dxpqn.x = 0.0f;
+    dxpqn.y = 0.0f;
+    dypqn.x = 0.0f;
+    dypqn.y = 0.0f;
+    n = (trans.na + 1) / 2;
+    c.x = 0.0f;
+    c.y = 0.0f;
+    cdx.x = 0.0f;
+    cdx.y = 0.0f;
+    cdy.x = 0.0f;
+    cdy.y = 0.0f;
+    for (i = 0; i < n; i++)
+    {
+        pq = pqn;
+        dxpq = dxpqn;
+        dypq = dypqn;
+        i0 = i * 2;
+        i1 = i0 + 1;
+        c.x += trans.a[i0] * pq.x - trans.a[i1] * pq.y;
+        c.y += trans.a[i0] * pq.y + trans.a[i1] * pq.x;
+        cdx.x += trans.a[i0] * dxpq.x - trans.a[i1] * dxpq.y;
+        cdx.y += trans.a[i0] * dxpq.y + trans.a[i1] * dxpq.x;
+        cdy.x += trans.a[i0] * dypq.x - trans.a[i1] * dypq.y;
+        cdy.y += trans.a[i0] * dypq.y + trans.a[i1] * dypq.x;
+        pqn.x = p.x * pq.x - p.y * pq.y;
+        pqn.y = p.x * pq.y + p.y * pq.x;
+        dxpqn.x = p.x * dxpq.x - p.y * dxpq.y + pq.x;
+        dxpqn.y = p.x * dxpq.y + p.y * dxpq.x + pq.y;
+        dypqn.x = p.x * dypq.x - p.y * dypq.y - pq.y;
+        dypqn.y = p.x * dypq.y + p.y * dypq.x + pq.x;
+    }
+    dt.x = c.x - t.x;
+    dt.y = c.y - t.y;
+    l = sqrt(dt.x * dt.x + dt.y * dt.y);
+    l = (l > 0.0f) ? l : 1.0f;
+    gt.x = dt.x / l;
+    gt.y = dt.y / l;
+    ldx = sqrt(cdx.x * cdx.x + cdx.y * cdx.y);
+    ldx = (ldx > 0.0f) ? ldx : 1.0f;
+    gx.x = cdx.x / ldx;
+    gx.y = cdx.y / ldx;
+    ldy = sqrt(cdy.x * cdy.x + cdy.y * cdy.y);
+    ldy = (ldy > 0.0f) ? ldy : 1.0f;
+    gy.x = cdy.x / ldy;
+    gy.y = cdy.y / ldy;
+    gl.x = l / ldx;
+    gl.y = l / ldy;
+    g.x = gl.x * (gt.x * gx.x + gt.y * gx.y) / 2;
+    g.y = gl.y * (gt.x * gy.x + gt.y * gy.y) / 2;
+    c.x = p.x - g.x;
+    c.y = p.y - g.y;
 
     return c;
 }
@@ -207,7 +268,7 @@ GCIcoord GCIconformaltrans(GCIctrans trans, GCIcoord c)
 
 GCIparams GCIcalcallparams(GCIparams params)
 {
-    unsigned i, j, k;
+    unsigned i;
     int h, w;
     GCIcoord cmin1, cmax1, cmean1, cd1;
     GCIcoord cmin2, cmax2, cmean2, cd2;
@@ -289,30 +350,6 @@ GCIparams GCIcalcallparams(GCIparams params)
     params.size2.height = (h > 0) ? h : 1;
     params.size2.width = (w > 0) ? w : 1;
 
-    params.grid.count = (params.grid.n + 1) * (params.grid.n + 1);
-    params.grid.p1 = (GCIcoord*)malloc(params.grid.count * sizeof(GCIcoord));
-    params.grid.p2 = (GCIcoord*)malloc(params.grid.count * sizeof(GCIcoord));
-    params.grid.pd = (GCIcoord*)malloc(params.grid.count * sizeof(GCIcoord));
-    cmin1.x -= cd1.x * 0.5f;
-    cmin1.y -= cd1.y * 0.5f;
-    cd1.x *= 2.0f;
-    cd1.y *= 2.0f;
-    cd1.x /= (float)params.grid.n;
-    cd1.y /= (float)params.grid.n;
-    params.grid.kernel = 0.25f * (cd1.x * cd1.x + cd1.y * cd1.y);
-    for (i = 0; i <= params.grid.n; i++)
-    {
-        for (j = 0; j <= params.grid.n; j++)
-        {
-            k = i * (params.grid.n + 1) + j;
-            params.grid.p1[k].x = cmin1.x + cd1.x * i;
-            params.grid.p1[k].y = cmin1.y + cd1.y * j;
-            params.grid.p2[k] = GCIconformaltrans(params.trans, params.grid.p1[k]);
-            params.grid.pd[k].x = params.grid.p2[k].x - params.grid.p1[k].x;
-            params.grid.pd[k].y = params.grid.p2[k].y - params.grid.p1[k].y;
-        }
-    }
-
     return params;
 }
 
@@ -321,8 +358,7 @@ GCIparams GCIcalcallparams(GCIparams params)
 IMTimage IMTFilterGeoConform (IMTimage p_im, IMTimage d_im, GCIparams params)
 {
     unsigned i, j, k;
-    GCIcoord ct, cdt, cf, wc;
-    float w, ws;
+    GCIcoord ct, cf;
 
     for (i = 0; i < d_im.size.height; i++)
     {
@@ -330,25 +366,11 @@ IMTimage IMTFilterGeoConform (IMTimage p_im, IMTimage d_im, GCIparams params)
         for (j = 0; j < d_im.size.width; j++)
         {
             ct.y = params.rect2.min.y + (0.5f + j) * params.mi;
-            wc.x = 0.0f;
-            wc.y = 0.0f;
-            ws = 0.0f;
-            for (k = 0; k < params.grid.count; k++)
+            cf = params.rect1.mean;
+            for (k = 0; k < params.iters; k++)
             {
-                cdt.x = ct.x - params.grid.p2[k].x;
-                cdt.y = ct.y - params.grid.p2[k].y;
-                w = params.grid.kernel / (params.grid.kernel + cdt.x * cdt.x + cdt.y * cdt.y);
-                wc.x += params.grid.pd[k].x * w;
-                wc.y += params.grid.pd[k].y * w;
-                ws += w;
+                cf = GCIconformaltransnewton(params.trans, cf, ct);
             }
-            if (ws > 0.0f)
-            {
-                wc.x /= ws;
-                wc.y /= ws;
-            }
-            cf.x = ct.x - wc.x;
-            cf.y = ct.y - wc.y;
             cf.x -= params.rect1.min.x;
             cf.y -= params.rect1.min.y;
             cf.x *= params.m;

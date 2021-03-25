@@ -28,17 +28,11 @@ geoconformimage [options] <input_image> <output_image>
 ### Options
 
 ```sh
-    -g N    grid set (default = 10)
+    -i N    iteration set (default = 10)
     -p str  string conform params: "A0,B0,A1,B1,[...,A9,B9]"
     -r str  string region image: "Xws,Yws,Xne,Yne"
     -h      this help
 ```
-
-### Warning!
-
-Elastic back radial mesh does not always cope.
-Try increasing the "grid set", but this will increase
-the processing time by a factor of `O(N^4)`.
 
 ### Example
 

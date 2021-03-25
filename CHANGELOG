@@ -3,6 +3,10 @@
 
 ----------------------------------------------------------------
 
+0.20210325
+
+    Stable: the smooth mesh is replaced by Newtonian iterations.
+
 0.20210324
 
     First: Test version
