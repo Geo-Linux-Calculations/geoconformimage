@@ -106,21 +106,20 @@ int main(int argc, char *argv[])
         if (FreeImage_GetImageType(dib) == FIT_BITMAP)
         {
             FIBITMAP* dst_dib;
-            imgin.size.width = FreeImage_GetWidth(dib);
-            imgin.size.height = FreeImage_GetHeight(dib);
-            params.size1 = imgin.size;
-            IMTimage p_im = IMTalloc(imgin.size, 24);
-            p_im = ImthresholdGetData(dib, p_im);
+            params.size1.width = FreeImage_GetWidth(dib);
+            params.size1.height = FreeImage_GetHeight(dib);
+            imgin = IMTalloc(params.size1, 24);
+            imgin = ImthresholdGetData(dib, imgin);
             FreeImage_Unload(dib);
             params = GCIcalcallparams(params);
-            IMTimage d_im = IMTalloc(params.size2, 24);
+            imgout = IMTalloc(params.size2, 24);
             printf("Result image size \"%dx%d\".\n", params.size2.width, params.size2.height);
 
-            IMTFilterGeoConform(p_im, d_im, params);
-            p_im = IMTfree(p_im);
-            dst_dib = FreeImage_Allocate(d_im.size.width, d_im.size.height, 24);
-            ImthresholdSetData(dst_dib, d_im);
-            d_im = IMTfree(d_im);
+            IMTFilterGeoConform(imgin, imgout, params);
+            imgin = IMTfree(imgin);
+            dst_dib = FreeImage_Allocate(imgout.size.width, imgout.size.height, 24);
+            ImthresholdSetData(dst_dib, imgout);
+            imgout = IMTfree(imgout);
             printf("Result rect from \"(%f,%f)-(%f,%f)\" to \"(%f,%f)-(%f,%f)\".\n", params.rect1.min.x, params.rect1.min.y, params.rect1.max.x, params.rect1.max.y, params.rect2.min.x, params.rect2.min.y, params.rect2.max.x, params.rect2.max.y);
 
             if (dst_dib)

@@ -2,15 +2,16 @@ PNAME         = geoconformimage
 PROGNAME      = $(PNAME)
 CC            = gcc
 CPP           = g++
-CFLAGS        = -DUNIX -O2 -Wall -s
-LIBS          = -lfreeimage
+CFLAGS        = -Isrc -DUNIX -O2 -Wall -s
 VER           = 0
-VERB          = 20210325
+VERB          = 20210414
 ifeq ($(OS),Windows_NT)
+LIBS          = FreeImage.lib
 PLIBF         = $(PNAME).$(VER).dll
 PLIBFI        = $(PNAME)freeimage.$(VER).dll
 RM            = del /Q
 else
+LIBS          = -lfreeimage
 PLIBF         = lib$(PNAME).so.$(VER)
 PLIBFI        = lib$(PNAME)freeimage.so.$(VER)
 RM            = rm -f
