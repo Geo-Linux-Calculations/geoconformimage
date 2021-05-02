@@ -3,25 +3,24 @@ PROGNAME      = $(PNAME)
 CC            = gcc
 CPP           = g++
 CFLAGS        = -Isrc -DUNIX -O2 -Wall -s
+SRCS          = src
 VER           = 0
-VERB          = 20210414
+VERB          = 20210502
 ifeq ($(OS),Windows_NT)
-LIBS          = FreeImage.lib
+LIBS          = $(SRCS)/FreeImage.lib
 PLIBF         = $(PNAME).$(VER).dll
 PLIBFI        = $(PNAME)freeimage.$(VER).dll
-RM            = del /Q
 else
 LIBS          = -lfreeimage
 PLIBF         = lib$(PNAME).so.$(VER)
 PLIBFI        = lib$(PNAME)freeimage.so.$(VER)
-RM            = rm -f
 endif
 PLIB          = $(PLIBF) $(PLIBFI)
 PREFIX        = /usr/local
 DOCPREFIX     = $(PREFIX)/share/doc/$(PNAME)
-SRCS          = src
 INSTALL       = install
 LN            = ln -fs
+RM            = rm -f
 
 .PHONY: all clean install
 

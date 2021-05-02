@@ -1,5 +1,5 @@
 # GeoConformImage
-# 0.20210323
+# 0.20210502
 
 Download
 --------
@@ -13,6 +13,8 @@ Dependencies
 Depends this library:
 
   freeimage
+
+For Windows: copy `FreeImage.dll` in project and `FreeImage.lib` + `FreeImage.h` in `src` project.
 
 Build
 -----

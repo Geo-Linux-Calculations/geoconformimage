@@ -43,6 +43,7 @@ extern "C" {
 #define COUNTA 20
 #define COUNTC 3
 #define COUNTG 10
+#define COUNTM 0
 
     typedef uint8_t BYTE;
     typedef uint16_t WORD;
@@ -96,6 +97,7 @@ extern "C" {
         GCIrect rect1, rect2;
         float m, mi;
         int iters;
+        int margin;
     }
     GCIparams;
 
@@ -108,7 +110,8 @@ extern "C" {
     IMTpixel IMTcalcS (IMTpixel);
     IMTimage IMTalloc (IMTsize, int);
     IMTimage IMTfree (IMTimage);
-    IMTpixel IMTinterpolation (IMTimage, GCIcoord);
+    IMTpixel IMTInterpolateBiCubic (IMTimage, GCIcoord);
+    IMTpixel IMTInterpolateBiLine (IMTimage, GCIcoord);
     GCIcoord GCIconformaltrans(GCIctrans, GCIcoord);
     GCIparams GCIcalcallparams(GCIparams);
     IMTimage IMTFilterGeoConform (IMTimage, IMTimage, GCIparams);

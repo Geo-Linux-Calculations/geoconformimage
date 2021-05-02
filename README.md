@@ -29,6 +29,7 @@ geoconformimage [options] <input_image> <output_image>
 
 ```sh
     -i N    iteration set (default = 10)
+    -m N    margin (default = 0)
     -p str  string conform params: "A0,B0,A1,B1,[...,A9,B9]"
     -r str  string region image: "Xws,Yws,Xne,Yne"
     -h      this help
@@ -57,7 +58,7 @@ Output= world-rus.jpg.out.png
 
 ## Copyright
 
-Public Domain Mark 1.0
+Public Domain Mark 1.0  
  No Copyright
 
 

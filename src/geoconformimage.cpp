@@ -28,6 +28,7 @@ void GeoConformImageUsage(const char *progname)
     printf("Usage : %s [options] <input_image> <output_image>\n", progname);
     printf("options:\n");
     printf("    -i N    iteration set (default = %d)\n", COUNTG);
+    printf("    -m N    margin (default = %d)\n", COUNTM);
     printf("    -p str  string conform params: \"A0,B0,A1,B1,[...,A9,B9]\"\n");
     printf("    -r str  string region image: \"Xws,Yws,Xne,Yne\"\n");
     printf("    -h      this help\n");
@@ -47,10 +48,11 @@ int main(int argc, char *argv[])
     IMTimage imgin, imgout;
     bool fhelp = false;
     params.iters = COUNTG;
+    params.margin = COUNTM;
 
     GeoConformImageTitle();
 
-    while ((opt = getopt(argc, argv, ":i:p:r:h")) != -1)
+    while ((opt = getopt(argc, argv, ":i:m:p:r:h")) != -1)
     {
         switch(opt)
         {
@@ -58,6 +60,11 @@ int main(int argc, char *argv[])
             params.iters = atoi(optarg);
             if (params.iters < 2) params.iters = 2;
             printf("Parameter iters set %d.\n", params.iters);
+            break;
+        case 'm':
+            params.margin = atoi(optarg);
+            if (params.margin < 0) params.margin = 0;
+            printf("Parameter margin set %d.\n", params.margin);
             break;
         case 'p':
             params.trans.na = sscanf(optarg, "%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf", &params.trans.a[0], &params.trans.a[1], &params.trans.a[2], &params.trans.a[3], &params.trans.a[4], &params.trans.a[5], &params.trans.a[6], &params.trans.a[7], &params.trans.a[8], &params.trans.a[9], &params.trans.a[10], &params.trans.a[11], &params.trans.a[12], &params.trans.a[13], &params.trans.a[14], &params.trans.a[15], &params.trans.a[16], &params.trans.a[17], &params.trans.a[18], &params.trans.a[19]);

@@ -3,6 +3,10 @@
 
 ----------------------------------------------------------------
 
+0.20210502
+
+    Stable: BiCubic interpolation and margin
+
 0.20210414
 
     FreeImage: fix ImthresholdGenericLoader
