@@ -1,3 +1,9 @@
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/Geo-Linux-Calculations/geoconformimage)
+![GitHub Release Date](https://img.shields.io/github/release-date/Geo-Linux-Calculations/geoconformimage)
+![GitHub repo size](https://img.shields.io/github/repo-size/Geo-Linux-Calculations/geoconformimage)
+![GitHub all releases](https://img.shields.io/github/downloads/Geo-Linux-Calculations/geoconformimage/total)
+![GitHub](https://img.shields.io/github/license/Geo-Linux-Calculations/geoconformimage)
+
 # GeoConformImage
 
 ## Description
